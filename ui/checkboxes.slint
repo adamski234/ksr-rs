@@ -75,8 +75,16 @@ export component CheckBoxTree inherits ListView {
 	in-out property <[CheckBoxTreeData]> model;
 	callback root-toggled(tree-toggled: int);
 	callback child-toggled(tree-toggled: int, child-toggled: int);
-	for tree-part in root.model: CheckBoxTreePart {
+	for tree-part[tree-index] in root.model: CheckBoxTreePart {
 		root-element: tree-part.root;
 		children: tree-part.children;
+
+		entry-toggled(entry-index) => {
+			root.child-toggled(tree-index, entry-index);
+		}
+		root-toggled => {
+			tree-part.root.checked = self.root-element.checked;
+			root.root-toggled(tree-index);
+		}
 	}
 }
