@@ -1,0 +1,147 @@
+import { Button, VerticalBox, HorizontalBox, CheckBox, GridBox } from "std-widgets.slint";
+import { CheckBoxList, CheckBoxTree, CheckBoxTreeData, CheckBoxListElementData } from "checkboxes.slint";
+
+export component AppWindow inherits Window {
+	preferred-height: 700px;
+	preferred-width: 900px;
+	padding: 20px;
+
+	in-out property <[CheckBoxTreeData]> quantifiers: [
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] }
+	];
+	callback quantifier-root-toggled(tree-index: int);
+	callback quantifier-child-toggled(tree-index: int, entry-index: int);
+
+	in-out property <[CheckBoxTreeData]> qualifiers: [
+		{ root: { text: "dupa" }, children: [{ text: "kid1" }] }
+	];
+	callback qualifier-root-toggled(tree-index: int);
+	callback qualifier-child-toggled(tree-index: int, entry-index: int);
+
+	in-out property <[CheckBoxTreeData]> variables: [
+		{ root: { text: "dupa" }, children: [{ text: "kid1" }] }
+	];
+	callback variable-root-toggled(tree-index: int);
+	callback variable-child-toggled(tree-index: int, entry-index: int);
+
+	in-out property <[CheckBoxListElementData]> subjects: [
+		{ text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }
+	];
+	callback subject-toggled(entry-index: int);
+
+	callback load-vars-pressed();
+	callback save-vars-pressed();
+	callback generate-summaries-pressed();
+
+	HorizontalLayout {
+		VerticalLayout {
+			width: 30%;
+
+			VerticalLayout {
+				VerticalLayout {
+					alignment: LayoutAlignment.stretch;
+
+					Text {
+						text: "Quantifiers";
+					}
+					CheckBoxTree {
+						model <=> root.quantifiers;
+						child-toggled(tree, entry) => {
+							root.quantifier-child-toggled(tree, entry);
+						}
+						root-toggled(tree-toggled) => {
+							root.quantifier-root-toggled(tree-toggled);
+						}
+					}
+				}
+
+				VerticalLayout {
+					alignment: LayoutAlignment.stretch;
+					Text {
+						text: "Qualifiers";
+					}
+					CheckBoxTree {
+						model <=> root.qualifiers;
+						child-toggled(tree, entry) => {
+							root.qualifier-child-toggled(tree, entry);
+						}
+						root-toggled(tree-toggled) => {
+							root.qualifier-root-toggled(tree-toggled);
+						}
+					}
+				}
+
+
+				VerticalLayout {
+					alignment: LayoutAlignment.stretch;
+					Text {
+						text: "Variables and labels";
+					}
+					CheckBoxTree {
+						model <=> root.variables;
+						child-toggled(tree, entry) => {
+							root.variable-child-toggled(tree, entry);
+						}
+						root-toggled(tree-toggled) => {
+							root.variable-root-toggled(tree-toggled);
+						}
+					}
+				}
+
+
+				VerticalLayout {
+					alignment: LayoutAlignment.stretch;
+					Text {
+						vertical-stretch: 0.1;
+						text: "Subjects";
+					}
+					CheckBoxList {
+						vertical-stretch: 0.9;
+						entries <=> root.subjects;
+						entry-toggled(entry-index) => {
+							root.subject-toggled(entry-index);
+						}
+					}
+				}
+			}
+			GridLayout {
+				spacing: 10px;
+				height: 10%;
+				Button {
+					row: 0;
+					col: 0;
+					text: "Load vars from file";
+					clicked => {
+						root.load-vars-pressed();
+					}
+				}
+
+				Button {
+					row: 1;
+					col: 0;
+					text: "Save vars to file";
+					clicked => {
+						root.save-vars-pressed();
+					}
+				}
+
+				Button {
+					row: 1;
+					col: 1;
+					text: "Generate summaries";
+					clicked => {
+						root.generate-summaries-pressed();
+					}
+				}
+			}
+		}
+		Text {
+			width: 70%;
+			text: "textos";
+		}
+	}
+}

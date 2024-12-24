@@ -1,0 +1,82 @@
+import { CheckBox, ListView } from "std-widgets.slint";
+
+component CheckBoxListEntry {
+	in property <string> text;
+	in-out property <bool> checked;
+	callback toggled();
+	HorizontalLayout {
+		CheckBox {
+			checked <=> root.checked;
+			toggled => {
+				root.toggled();
+			}
+		}
+		Text {
+			text: root.text;
+		}
+
+		spacing: 5px;
+	    visible: true;
+		padding: 5px;
+		alignment: LayoutAlignment.start;
+	}
+}
+
+export struct CheckBoxListElementData {
+	text: string,
+	checked: bool,
+}
+
+export component CheckBoxList inherits ListView {
+	in-out property <[CheckBoxListElementData]> entries;
+	callback entry-toggled(entry-index: int);
+	for entry[entry-index] in root.entries: child := CheckBoxListEntry {
+		checked: entry.checked;
+		text: entry.text;
+		toggled => {
+			entry.checked = self.checked;
+			root.entry-toggled(entry-index);
+		}
+	}
+}
+
+component CheckBoxTreePart {
+	in-out property <CheckBoxListElementData> root-element;
+	in-out property <[CheckBoxListElementData]> children;
+	callback root-toggled();
+	callback entry-toggled(entry-index: int);
+	VerticalLayout {
+		CheckBoxListEntry {
+			checked: root.root-element.checked;
+			text: root.root-element.text;
+			toggled => {
+				root.root-element.checked = self.checked;
+				root.root-toggled();
+			}
+		}
+		for entry[entry-index] in root.children: CheckBoxListEntry {
+			checked: entry.checked;
+			text: entry.text;
+			x: 20px;
+			toggled => {
+				entry.checked = self.checked;
+				root.entry-toggled(entry-index);
+			}
+		}
+	}
+}
+
+export struct CheckBoxTreeData {
+	root: CheckBoxListElementData,
+	children: [CheckBoxListElementData]
+}
+
+export component CheckBoxTree inherits ListView {
+	in-out property <[CheckBoxTreeData]> model;
+	callback root-toggled(tree-toggled: int);
+	callback child-toggled(tree-toggled: int, child-toggled: int);
+	for tree-part in root.model: CheckBoxTreePart {
+		root-element: tree-part.root;
+		children: tree-part.children;
+	}
+}
