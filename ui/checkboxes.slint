@@ -7,18 +7,12 @@ component CheckBoxListEntry {
 	HorizontalLayout {
 		CheckBox {
 			checked <=> root.checked;
+			text: root.text;
 			toggled => {
 				root.toggled();
 			}
 		}
-		Text {
-			text: root.text;
-		}
-
-		spacing: 5px;
-	    visible: true;
 		padding: 5px;
-		alignment: LayoutAlignment.start;
 	}
 }
 

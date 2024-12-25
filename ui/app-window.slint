@@ -7,7 +7,7 @@ export component AppWindow inherits Window {
 	padding: 20px;
 
 	in-out property <[CheckBoxTreeData]> quantifiers: [
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
+		{ root: { text: "dupa11" }, children: [{ text: "kid1" }, { text: "kid2" }, { text: "kid3" }] },
 		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
 		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
 		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
@@ -36,6 +36,12 @@ export component AppWindow inherits Window {
 	callback load-vars-pressed();
 	callback save-vars-pressed();
 	callback generate-summaries-pressed();
+
+	property <bool> test-var: true;
+	generate-summaries-pressed => {
+		test-var = !test-var;
+		root.quantifiers[0].root.checked = test-var;
+	}
 
 	HorizontalLayout {
 		VerticalLayout {
