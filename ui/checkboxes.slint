@@ -1,37 +1,25 @@
-import { CheckBox, ListView } from "std-widgets.slint";
-
-component CheckBoxListEntry {
-	in property <string> text;
-	in-out property <bool> checked;
-	callback toggled();
-	HorizontalLayout {
-		CheckBox {
-			checked <=> root.checked;
-			text: root.text;
-			toggled => {
-				root.toggled();
-			}
-		}
-		padding: 5px;
-	}
-}
+import { CheckBox, ListView, ScrollView } from "std-widgets.slint";
 
 export struct CheckBoxListElementData {
 	text: string,
 	checked: bool,
 }
 
-export component CheckBoxList inherits ListView {
+export component CheckBoxList inherits ScrollView {
 	in-out property <[CheckBoxListElementData]> entries;
 	callback entry-toggled(entry-index: int);
-	for entry[entry-index] in root.entries: child := CheckBoxListEntry {
-		checked: entry.checked;
-		text: entry.text;
-		toggled => {
-			entry.checked = self.checked;
-			root.entry-toggled(entry-index);
+	VerticalLayout {
+		spacing: 5px;
+		padding: 5px;
+		for entry[entry-index] in root.entries: child := CheckBox {
+			checked: entry.checked;
+			text: entry.text;
+			toggled => {
+				entry.checked = self.checked;
+				root.entry-toggled(entry-index);
+			}
 		}
-	}
+}
 }
 
 component CheckBoxTreePart {
@@ -40,7 +28,11 @@ component CheckBoxTreePart {
 	callback root-toggled();
 	callback entry-toggled(entry-index: int);
 	VerticalLayout {
-		CheckBoxListEntry {
+		padding: 5px;
+		spacing: 5px;
+
+		CheckBox {
+			padding: 5px;
 			checked: root.root-element.checked;
 			text: root.root-element.text;
 			toggled => {
@@ -48,13 +40,17 @@ component CheckBoxTreePart {
 				root.root-toggled();
 			}
 		}
-		for entry[entry-index] in root.children: CheckBoxListEntry {
-			checked: entry.checked;
-			text: entry.text;
-			x: 20px;
-			toggled => {
-				entry.checked = self.checked;
-				root.entry-toggled(entry-index);
+		VerticalLayout {
+			spacing: 5px;
+			padding-left: 20px;
+
+			for entry[entry-index] in root.children: CheckBox {
+				checked: entry.checked;
+				text: entry.text;
+				toggled => {
+					entry.checked = self.checked;
+					root.entry-toggled(entry-index);
+				}
 			}
 		}
 	}
