@@ -1,0 +1,140 @@
+{
+    "linguisticVariables":
+    [
+        {
+            "name": "temperature",
+            "fuzzificationType": "linear",
+            "labels": [
+                {"name": "cold", "supportPoints": [[0, 1], [19, 1], [23, 0]]},
+                {"name": "comfortable", "supportPoints": [[0, 0], [23, 1], [23, 1], [27, 0]]},
+                {"name": "hot", "supportPoints": [[0, 0], [24, 0], [30, 1], [100, 0]]}
+            ],
+            "uodBounds": [0, 100],
+            "parameter": "WaterTemperature"
+        },
+
+        {
+            "name": "pH",
+            "fuzzificationType": "linear",
+            "labels": [
+                {"name": "below norm", "supportPoints": [[2, 1], [6, 1], [7, 0]]},
+                {"name": "drinkable", "supportPoints": [[2, 0], [6, 0], [7, 1], [9, 1], [10, 0]]},
+                {"name": "above norms", "supportPoints": [[2, 0], [9, 0], [10, 1], [90, 1]]}
+            ],
+            "uodBounds": [2, 90],
+            "parameter": "pH"
+        },
+        {
+            "name": "alkalinity",
+            "labels": [
+                {"name": "too low", "supportPoints": [[0, 1], [35, 0]]},
+                {"name": "recommended", "supportPoints": [[0, 0], [30, 0], [40, 1], [500, 1], [700, 0]]},
+                {"name": "ideal", "supportPoints": [[0, 0], [60, 0], [70, 1], [100, 1], [110, 0]] },
+                {"name": "high", "supportPoints":  [[0, 0], [500, 0], [700, 1], [2800, 1]]}
+            ],
+            "uodBounds": [0, 2800],
+            "parameter": "TotalAlkalinity"
+        },
+        {
+            "name": "hardness",
+            "labels": [
+                {"name": "below norm", "supportPoints": [[0, 1], [55, 1], [70, 0], [7100, 0]]},
+                {"name": "acceptable", "supportPoints": [[0, 0], [55, 1], [470, 1], [600, 0], [7100, 0]]},
+                {"name": "above norm", "supportPoints": [[0, 0], [480, 0], [550, 1], [7100, 1]] }
+            ],
+            "uodBounds": [0, 7100],
+            "parameter": "TotalHardness"
+        },
+        {
+            "name": "conductance",
+            "labels": [
+                {"name": "below norm", "supportPoints": [[0, 1], [2000, 1], [2400, 0], [50000, 0]]},
+                {"name": "within norm", "supportPoints": [[0, 0], [2300, 0], [2500, 1], [2700, 0], [50000, 0]]},
+                {"name": "above norm", "supportPoints": [[0, 0], [2600, 0], [3400, 1], [50000, 1]] }
+            ],
+            "uodBounds": [1, 50000],
+            "parameter": "Conductance"
+        },
+        {
+            "name": "oxygen",
+            "labels": [
+                {"name": "immediately deadly", "supportPoints": [[0, 1], [0.45, 1], [0.55, 0], [8, 0]]},
+                {"name": "deadly after exposure", "supportPoints": [[0, 0], [0.45, 0], [0.55, 1], [1.45, 1], [1.55, 0], [8, 0]]},
+                {"name": "causes stress", "supportPoints": [[0, 0], [1.4, 0], [1.6, 1], [4.8, 1], [5.2, 0], [8, 0]]},
+                {"name": "desirable", "supportPoints": [[0, 0], [4.9, 0], [5.1, 1], [8, 1], [1100, 1]]}
+            ],
+            "uodBounds": [0, 1100],
+            "parameter": "DissolvedOxygen"
+        },
+        {
+            "name": "calcium",
+            "labels": [
+                {"name": "unacceptable", "supportPoints": [[0, 1], [25, 1], [35, 0], [100, 0]]},
+                {"name": "recommended", "supportPoints": [[0, 0], [25, 0], [35, 1], [75, 1], [85, 0], [100, 0]]},
+                {"name": "above norm", "supportPoints": [[0, 0], [70, 0], [90, 1], [100, 1], [1700, 1]] }
+            ],
+            "uodBounds": [0, 1700],
+            "parameter": "DissolvedCalcium"
+        },
+        {
+            "name": "magnesium",
+            "labels": [
+                {"name": "unacceptable", "supportPoints": [[0, 1], [7, 1], [13, 0], [40, 0]]},
+                {"name": "recommended", "supportPoints": [[0, 0], [8, 0], [22, 1], [28, 0], [32, 0], [40, 0]]},
+                {"name": "above norm", "supportPoints": [[0, 0], [28, 0], [35, 1], [40, 1], [1300, 1]] }
+            ],
+            "uodBounds": [0, 1300],
+            "parameter": "DissolvedMagnesium"
+        },
+        {
+            "name": "chlorine",
+            "labels": [
+                {"name": "acceptable", "supportPoints": [[0, 1], [3.8, 1], [5, 0], [7, 0]]},
+                {"name": "unacceptable", "supportPoints": [[0, 0], [3.9, 0], [4.5, 1], [7, 1], [19000, 1]]}
+            ],
+            "uodBounds": [0, 19000],
+            "parameter": "DissolvedChloride"
+        },
+        {
+            "name": "sodium",
+            "labels": [
+                {"name": "acceptable", "supportPoints": [[0, 1], [190, 1], [220, 0], [400, 0]]},
+                {"name": "unacceptable", "supportPoints": [[0, 0], [200, 0], [240, 1], [400, 1], [11100, 1]]}
+            ],
+            "uodBounds": [0, 11100],
+            "parameter": "DissolvedSodium"
+        }
+    ],
+    "quantifiers":
+    [
+        {
+            "name": "Amount relative to total",
+            "labels": [
+                {"name": "Neglectible amount", "supportPoints":  [[0, 1], [0.1, 0]]},
+                {"name": "Approximately 1/10", "supportPoints":  [[0, 0], [0.1, 1], [0.2, 0]]},
+                {"name": "Approximately 1/5", "supportPoints": [[0, 0], [0.1, 0], [0.2, 1], [0.25, 0]]},
+                {"name": "Approximately 1/3", "supportPoints": [[0, 0], [0.25, 0], [0.33333333333, 1], [0.5, 0]]},
+                {"name": "Approximately 1/2", "supportPoints": [[0, 0], [0.33333333333, 0], [0.5, 1], [0.66666666666, 0]]},
+                {"name": "Approximately 2/3", "supportPoints": [[0, 0], [0.5, 0], [0.66666666666, 1], [0.75, 0]]},
+                {"name": "Approximately 4/5", "supportPoints": [[0, 0], [0.75, 0], [0.8, 1], [0.9, 0]]},
+                {"name": "Approximately 9/10", "supportPoints":  [[0, 0], [0.85, 0], [0.9, 1], [1, 0]]},
+                {"name": "All or almost all", "supportPoints":  [[0, 0], [0.9, 0], [1.0, 1]]}
+            ],
+            "uodBounds": [0, 1]
+        },
+        {
+            "name": "Descriptive amount",
+            "labels": [
+                {"name": "Practically none", "supportPoints":  [[0, 1], [0.01, 1], [0.05, 0]]},
+                {"name": "So little amount", "supportPoints":  [[0, 0], [0.05, 0], [0.15, 1], [0.2, 1], [0.5, 0]]},
+                {"name": "Somewhat little amount", "supportPoints":  [[0, 0], [0.15, 0], [0.25, 1], [0.3, 1], [0.5, 0]]},
+                {"name": "Approximately half", "supportPoints":  [[0, 0], [0.4, 0], [0.45, 1], [0.55, 1], [0.6, 0]]},
+                {"name": "Somewhat big amount", "supportPoints":  [[0, 0], [0.5, 0], [0.6, 1], [0.7, 1], [0.75, 0]]},
+                {"name": "Big amount", "supportPoints": [[0, 0], [0.5, 0], [0.75, 1], [0.8, 1], [0.95, 0]]},
+                {"name": "So big amount", "supportPoints":  [[0, 0], [0.8, 0], [0.9, 1], [0.95, 1], [0.99, 0]]},
+                {"name": "Practically all", "supportPoints":  [[0, 0], [0.95, 0], [0.99, 1], [1.0, 1]]}
+            ],
+            "uodBounds": [0, 1]
+        }
+    ]
+}

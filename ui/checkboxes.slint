@@ -1,5 +1,7 @@
 import { CheckBox, ListView, ScrollView } from "std-widgets.slint";
 
+// FIXME: CheckBoxes do not forward scroll event to the ScrollView/ListView underneath
+
 export struct CheckBoxListElementData {
 	text: string,
 	checked: bool,
