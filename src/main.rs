@@ -1,5 +1,7 @@
-use std::error::Error;
+use std::{env::current_dir, error::Error};
 
+use common::variables::FileLoadError;
+use rfd::MessageButtons;
 use slint::{Model, ModelRc};
 
 slint::include_modules!();
@@ -32,6 +34,55 @@ fn main() -> Result<(), Box<dyn Error>> {
 	let ui_weak = ui.as_weak();
 	ui.on_variable_child_toggled(move |tree_index, entry_index| {
 		handle_checkbox_tree_child_toggle(tree_index, entry_index, ui_weak.unwrap().get_variables());
+	});
+
+	let ui_weak = ui.as_weak();
+	ui.on_load_vars_pressed(move || {
+		let ui = ui_weak.unwrap();
+		ui.set_load_vars_open(true);
+		slint::spawn_local(async move {
+			let picked_file = rfd::AsyncFileDialog::new()
+				.add_filter("JSON files", &["json"])
+				.set_directory(current_dir().unwrap())
+				.set_title("Choose JSON file with variables")
+				.pick_file().await;
+			if let Some(picked_file) = picked_file {
+				match common::variables::parse_file(picked_file.path()) {
+					Ok(data) => {
+						println!("{:?}", data);
+					}
+					Err(FileLoadError::FileNotFound) => {
+						rfd::AsyncMessageDialog::new()
+							.set_title("Variables not loaded")
+							.set_description("The requested file could not be found.")
+							.set_buttons(MessageButtons::Ok)
+							.show().await;
+					}
+					Err(FileLoadError::InvalidJSON) => {
+						rfd::AsyncMessageDialog::new()
+							.set_title("Variables not loaded")
+							.set_description("The requested file did not contain valid JSON.")
+							.set_buttons(MessageButtons::Ok)
+							.show().await;
+					}
+					Err(FileLoadError::PermissionDenied) => {
+						rfd::AsyncMessageDialog::new()
+							.set_title("Variables not loaded")
+							.set_description("Permission denied when trying to access file.")
+							.set_buttons(MessageButtons::Ok)
+							.show().await;
+					}
+					Err(FileLoadError::OtherError(error_data)) => {
+						rfd::AsyncMessageDialog::new()
+							.set_title("Variables not loaded")
+							.set_description(format!("Unknown error:\n {:#?}", error_data))
+							.set_buttons(MessageButtons::Ok)
+							.show().await;
+					}
+				}
+			}
+			ui.set_load_vars_open(false);
+		}).unwrap();
 	});
 
 	ui.run()?;

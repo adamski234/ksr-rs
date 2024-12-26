@@ -1,4 +1,4 @@
-import { Button, VerticalBox, HorizontalBox, CheckBox, GridBox } from "std-widgets.slint";
+import { Button, CheckBox } from "std-widgets.slint";
 import { CheckBoxList, CheckBoxTree, CheckBoxTreeData, CheckBoxListElementData } from "checkboxes.slint";
 
 export component AppWindow inherits Window {
@@ -37,10 +37,11 @@ export component AppWindow inherits Window {
 	callback save-vars-pressed();
 	callback generate-summaries-pressed();
 
-	property <bool> test-var: true;
+	in-out property <bool> load-vars-open;
+	in-out property <bool> save-vars-open;
+
 	generate-summaries-pressed => {
-		test-var = !test-var;
-		root.quantifiers[0].root.checked = test-var;
+		root.quantifiers[0].root.checked = !root.quantifiers[0].root.checked;
 	}
 
 	HorizontalLayout {
@@ -121,6 +122,7 @@ export component AppWindow inherits Window {
 					row: 0;
 					col: 0;
 					text: "Load vars from file";
+					enabled: !root.load-vars-open;
 					clicked => {
 						root.load-vars-pressed();
 					}
@@ -130,6 +132,7 @@ export component AppWindow inherits Window {
 					row: 1;
 					col: 0;
 					text: "Save vars to file";
+					enabled: !root.save-vars-open;
 					clicked => {
 						root.save-vars-pressed();
 					}
