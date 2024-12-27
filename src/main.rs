@@ -6,6 +6,23 @@ use slint::{Model, ModelRc};
 
 slint::include_modules!();
 
+fn file_load_error_to_message(err: FileLoadError) -> String {
+	match err {
+		FileLoadError::FileNotFound => {
+			return String::from("The requested file could not be found.")
+		}
+		FileLoadError::InvalidJSON => {
+			return String::from("The requested file did not contain valid JSON.")
+		}
+		FileLoadError::PermissionDenied => {
+			return String::from("Permission denied when trying to access file.")
+		}
+		FileLoadError::OtherError(error_data) => {
+			return format!("Unknown error:\n {:#?}", error_data)
+		}
+	}
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
 	let ui = AppWindow::new()?;
 
@@ -51,31 +68,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 					Ok(data) => {
 						println!("{:?}", data);
 					}
-					Err(FileLoadError::FileNotFound) => {
+					Err(error) => {
 						rfd::AsyncMessageDialog::new()
 							.set_title("Variables not loaded")
-							.set_description("The requested file could not be found.")
-							.set_buttons(MessageButtons::Ok)
-							.show().await;
-					}
-					Err(FileLoadError::InvalidJSON) => {
-						rfd::AsyncMessageDialog::new()
-							.set_title("Variables not loaded")
-							.set_description("The requested file did not contain valid JSON.")
-							.set_buttons(MessageButtons::Ok)
-							.show().await;
-					}
-					Err(FileLoadError::PermissionDenied) => {
-						rfd::AsyncMessageDialog::new()
-							.set_title("Variables not loaded")
-							.set_description("Permission denied when trying to access file.")
-							.set_buttons(MessageButtons::Ok)
-							.show().await;
-					}
-					Err(FileLoadError::OtherError(error_data)) => {
-						rfd::AsyncMessageDialog::new()
-							.set_title("Variables not loaded")
-							.set_description(format!("Unknown error:\n {:#?}", error_data))
+							.set_description(file_load_error_to_message(error))
 							.set_buttons(MessageButtons::Ok)
 							.show().await;
 					}
