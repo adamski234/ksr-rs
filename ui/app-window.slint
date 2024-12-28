@@ -142,6 +142,7 @@ export component AppWindow inherits Window {
 					row: 1;
 					col: 1;
 					text: "Generate summaries";
+					enabled: !root.load-vars-open;
 					clicked => {
 						root.generate-summaries-pressed();
 					}
