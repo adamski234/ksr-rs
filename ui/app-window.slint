@@ -39,6 +39,7 @@ export component AppWindow inherits Window {
 
 	in-out property <bool> load-vars-open;
 	in-out property <bool> save-vars-open;
+	in-out property <bool> variables-loaded;
 
 	generate-summaries-pressed => {
 		root.quantifiers[0].root.checked = !root.quantifiers[0].root.checked;
@@ -132,7 +133,7 @@ export component AppWindow inherits Window {
 					row: 1;
 					col: 0;
 					text: "Save vars to file";
-					enabled: !root.save-vars-open;
+					enabled: !root.save-vars-open && root.variables-loaded;
 					clicked => {
 						root.save-vars-pressed();
 					}
@@ -142,7 +143,7 @@ export component AppWindow inherits Window {
 					row: 1;
 					col: 1;
 					text: "Generate summaries";
-					enabled: !root.load-vars-open;
+					enabled: !root.load-vars-open && root.variables-loaded;
 					clicked => {
 						root.generate-summaries-pressed();
 					}
