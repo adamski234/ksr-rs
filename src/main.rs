@@ -114,12 +114,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 							.show().await;
 					}
 				}
-			} else {
-				rfd::AsyncMessageDialog::new()
-					.set_title("Variables not saved")
-					.set_description("There are no loaded variables")
-					.set_buttons(MessageButtons::Ok)
-					.show().await;
 			}
 			ui.set_save_vars_open(false);
 		}).unwrap();
