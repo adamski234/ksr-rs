@@ -1,4 +1,4 @@
-use std::{env::current_dir, error::Error};
+use std::{cell::RefCell, env::current_dir, error::Error, rc::Rc};
 
 use common::variables::FileLoadError;
 use rfd::MessageButtons;
@@ -25,6 +25,8 @@ fn file_load_error_to_message(err: FileLoadError) -> String {
 
 fn main() -> Result<(), Box<dyn Error>> {
 	let ui = AppWindow::new()?;
+
+	let vars = Rc::new(RefCell::new(None));
 
 	let ui_weak = ui.as_weak();
 	ui.on_quantifier_root_toggled(move |tree_index| {
@@ -57,6 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 	ui.on_load_vars_pressed(move || {
 		let ui = ui_weak.unwrap();
 		ui.set_load_vars_open(true);
+		let vars = vars.clone();
 		slint::spawn_local(async move {
 			let picked_file = rfd::AsyncFileDialog::new()
 				.add_filter("JSON files", &["json"])
@@ -66,7 +69,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 			if let Some(picked_file) = picked_file {
 				match common::variables::parse_file(picked_file.path()) {
 					Ok(data) => {
-						println!("{:?}", data);
+						// Should not die since buttons are locked until processing ends
+						*vars.borrow_mut() = Some(data);
 					}
 					Err(error) => {
 						rfd::AsyncMessageDialog::new()
