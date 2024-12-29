@@ -6,31 +6,19 @@ export component AppWindow inherits Window {
 	preferred-width: 900px;
 	padding: 20px;
 
-	in-out property <[CheckBoxTreeData]> quantifiers: [
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }, { text: "kid2" }, { text: "kid3" }] },
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] },
-		{ root: { text: "dupa11" }, children: [{ text: "kid1" }] }
-	];
+	in-out property <[CheckBoxTreeData]> quantifiers;
 	callback quantifier-root-toggled(tree-index: int);
 	callback quantifier-child-toggled(tree-index: int, entry-index: int);
 
-	in-out property <[CheckBoxTreeData]> qualifiers: [
-		{ root: { text: "dupa" }, children: [{ text: "kid1" }] }
-	];
+	in-out property <[CheckBoxTreeData]> qualifiers;
 	callback qualifier-root-toggled(tree-index: int);
 	callback qualifier-child-toggled(tree-index: int, entry-index: int);
 
-	in-out property <[CheckBoxTreeData]> variables: [
-		{ root: { text: "dupa" }, children: [{ text: "kid1" }] }
-	];
+	in-out property <[CheckBoxTreeData]> variables;
 	callback variable-root-toggled(tree-index: int);
 	callback variable-child-toggled(tree-index: int, entry-index: int);
 
-	in-out property <[CheckBoxListElementData]> subjects: [
-		{ text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }, { text: "dyhoa1" }
-	];
+	in-out property <[CheckBoxListElementData]> subjects;
 	callback subject-toggled(entry-index: int);
 
 	callback load-vars-pressed();
@@ -40,10 +28,6 @@ export component AppWindow inherits Window {
 	in-out property <bool> load-vars-open;
 	in-out property <bool> save-vars-open;
 	in-out property <bool> variables-loaded;
-
-	generate-summaries-pressed => {
-		root.quantifiers[0].root.checked = !root.quantifiers[0].root.checked;
-	}
 
 	HorizontalLayout {
 		VerticalLayout {

@@ -1,8 +1,8 @@
 use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, rc::Rc};
 
-use common::variables::{FileLoadError, FileSaveError, VariableFile};
+use common::variables::{FileLoadError, FileSaveError, LinguisticVariable, VariableFile};
 use rfd::MessageButtons;
-use slint::{Model, ModelRc};
+use slint::{Model, ModelRc, VecModel};
 
 slint::include_modules!();
 
@@ -26,6 +26,17 @@ fn file_save_error_to_message(err: FileSaveError) -> String {
 		FileTooLarge => return String::from("The file is too large."),
 		OtherError(error_data) => return format!("Unknown error:\n {:#?}", error_data),
 	}
+}
+
+fn variables_to_checkboxes(vars: &[LinguisticVariable]) -> ModelRc<CheckBoxTreeData> {
+	return ModelRc::new(vars.iter().map(|item| {
+		return CheckBoxTreeData { 
+			root: CheckBoxListElementData { checked: false, text: item.name.clone().into() },
+			children: ModelRc::new(item.labels.iter().map(|label| {
+				return CheckBoxListElementData { checked: false, text: label.name.clone().into()};
+			}).collect::<VecModel<_>>()),
+		};
+	}).collect::<VecModel<_>>());
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -76,6 +87,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 				match VariableFile::parse_file(picked_file.path()) {
 					Ok(data) => {
 						// Should not die since buttons are locked until processing ends
+						ui.set_quantifiers(variables_to_checkboxes(&data.quantifiers));
+						ui.set_qualifiers(variables_to_checkboxes(&data.linguistic_variables));
+						ui.set_variables(variables_to_checkboxes(&data.linguistic_variables));
 						*vars.borrow_mut() = Some(data);
 						ui.set_variables_loaded(true);
 					}
