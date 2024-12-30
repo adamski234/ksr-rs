@@ -1,32 +1,10 @@
 use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, rc::Rc};
 
-use common::variables::{FileLoadError, FileSaveError, LinguisticVariable, VariableFile};
-use rfd::MessageButtons;
+use common::variables::{LinguisticVariable, VariableFile};
+mod error_dialog;
 use slint::{Model, ModelRc, VecModel};
 
 slint::include_modules!();
-
-fn file_load_error_to_message(err: FileLoadError) -> String {
-	use FileLoadError::*;
-	match err {
-		FileNotFound => return String::from("The requested file could not be found."),
-		InvalidJSON => return String::from("The requested file did not contain valid JSON."),
-		PermissionDenied => return String::from("Permission denied when trying to access file."),
-		OtherError(error_data) => return format!("Unknown error:\n {:#?}", error_data),
-	}
-}
-
-fn file_save_error_to_message(err: FileSaveError) -> String {
-	use FileSaveError::*;
-	match err {
-		PermissionDenied => return String::from("Permission denied when trying to write to file."),
-		ReadOnlyFilesystem => return String::from("The selected file is on a read-only filesystem."),
-		StorageFull => return String::from("Storage is full."),
-		QuotaExceeded => return String::from("Quota exceeded."),
-		FileTooLarge => return String::from("The file is too large."),
-		OtherError(error_data) => return format!("Unknown error:\n {:#?}", error_data),
-	}
-}
 
 fn variables_to_checkboxes(vars: &[LinguisticVariable]) -> ModelRc<CheckBoxTreeData> {
 	return ModelRc::new(vars.iter().map(|item| {
@@ -94,11 +72,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 						ui.set_variables_loaded(true);
 					}
 					Err(error) => {
-						rfd::AsyncMessageDialog::new()
-							.set_title("Variables not loaded")
-							.set_description(file_load_error_to_message(error))
-							.set_buttons(MessageButtons::Ok)
-							.show().await;
+                        error_dialog::show_error_dialog("Variables not loaded", error).await;
 					}
 				}
 			}
@@ -121,11 +95,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 					.save_file().await;
 				if let Some(picked_file) = picked_file {
 					if let Err(error) = data.save_file(picked_file.path()) {
-						rfd::AsyncMessageDialog::new()
-							.set_title("Variables not saved")
-							.set_description(file_save_error_to_message(error))
-							.set_buttons(MessageButtons::Ok)
-							.show().await;
+                        error_dialog::show_error_dialog("Variables not saved", error).await;
 					}
 				}
 			}
