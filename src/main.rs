@@ -1,6 +1,6 @@
-use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, rc::Rc};
+use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, path::Path, rc::Rc};
 
-use common::variables::{LinguisticVariable, VariableFile};
+use common::{data, variables::{LinguisticVariable, VariableFile}};
 mod error_dialog;
 use slint::{Model, ModelRc, VecModel};
 
@@ -21,6 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 	let ui = AppWindow::new()?;
 
 	let vars = Rc::new(RefCell::new(None));
+	//let data = Rc::new(RefCell::new(None));
 
 	let ui_weak = ui.as_weak();
 	ui.on_quantifier_root_toggled(move |tree_index| {
@@ -100,6 +101,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 				}
 			}
 			ui.set_save_vars_open(false);
+		}).unwrap();
+	});
+
+	ui.on_generate_summaries_pressed(|| {
+		slint::spawn_local(async {
+			let data = data::Sample::load_from_db(Path::new("./ksr_copy.db")).await;
+			println!("{}", data.len());
 		}).unwrap();
 	});
 
