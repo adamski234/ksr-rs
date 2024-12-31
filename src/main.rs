@@ -1,4 +1,4 @@
-use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, path::Path, rc::Rc};
+use std::{cell::RefCell, env::current_dir, error::Error, ops::Deref, rc::Rc};
 
 use common::{data, variables::{LinguisticVariable, VariableFile}};
 mod error_dialog;
@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 	let ui = AppWindow::new()?;
 
 	let vars = Rc::new(RefCell::new(None));
-	//let data = Rc::new(RefCell::new(None));
+	let data = Rc::new(RefCell::new(None));
 
 	let ui_weak = ui.as_weak();
 	ui.on_quantifier_root_toggled(move |tree_index| {
@@ -104,10 +104,25 @@ fn main() -> Result<(), Box<dyn Error>> {
 		}).unwrap();
 	});
 
-	ui.on_generate_summaries_pressed(|| {
-		slint::spawn_local(async {
-			let data = data::Sample::load_from_db(Path::new("./ksr_copy.db")).await;
-			println!("{}", data.len());
+	let data_clone = data.clone();
+	let ui_weak = ui.as_weak();
+	ui.on_load_data_pressed(move || {
+		let ui = ui_weak.unwrap();
+		ui.set_load_data_open(true);
+		let data = data_clone.clone();
+		slint::spawn_local(async move {
+			let picked_file = rfd::AsyncFileDialog::new()
+				.add_filter("SQLite databases", &["db"])
+				.set_directory(current_dir().unwrap())
+				.set_title("Choose the database")
+				.pick_file().await;
+			if let Some(picked_file) = picked_file {
+				let loaded_data = data::Sample::load_from_db(picked_file.path()).await;
+				ui.set_sample_count(loaded_data.len() as i32);
+				*data.borrow_mut() = Some(loaded_data);
+				ui.set_data_loaded(true);
+			}
+			ui.set_load_data_open(false);
 		}).unwrap();
 	});
 

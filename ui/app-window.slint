@@ -22,12 +22,16 @@ export component AppWindow inherits Window {
 	callback subject-toggled(entry-index: int);
 
 	callback load-vars-pressed();
+	callback load-data-pressed();
 	callback save-vars-pressed();
 	callback generate-summaries-pressed();
 
 	in-out property <bool> load-vars-open;
 	in-out property <bool> save-vars-open;
+	in-out property <bool> load-data-open;
 	in-out property <bool> variables-loaded;
+	in-out property <bool> data-loaded;
+	in-out property <int> sample-count;
 
 	HorizontalLayout {
 		VerticalLayout {
@@ -103,6 +107,7 @@ export component AppWindow inherits Window {
 			GridLayout {
 				spacing: 10px;
 				height: 10%;
+
 				Button {
 					row: 0;
 					col: 0;
@@ -110,6 +115,16 @@ export component AppWindow inherits Window {
 					enabled: !root.load-vars-open;
 					clicked => {
 						root.load-vars-pressed();
+					}
+				}
+
+				Button {
+					row: 0;
+					col: 1;
+					text: "Load samples from file";
+					enabled: !root.load-data-open;
+					clicked => {
+						root.load-data-pressed();
 					}
 				}
 
@@ -127,10 +142,24 @@ export component AppWindow inherits Window {
 					row: 1;
 					col: 1;
 					text: "Generate summaries";
-					enabled: !root.load-vars-open && root.variables-loaded;
+					enabled: !root.load-vars-open && root.variables-loaded && !root.load-data-open && root.data-loaded;
 					clicked => {
 						root.generate-summaries-pressed();
 					}
+				}
+
+				Text {
+					row: 2;
+					col: 0;
+
+					text: "Variables: " + (root.variables-loaded ? "" : "not ") + "loaded";
+				}
+
+				Text {
+					row: 2;
+					col: 1;
+
+					text: "Samples: " + root.sample-count;
 				}
 			}
 		}
