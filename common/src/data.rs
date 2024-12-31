@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{io::ErrorKind, path::Path};
 
 use sqlx::{query_as, Connection};
 
@@ -34,10 +34,48 @@ impl From<String> for SampleArea {
 	}
 }
 
+#[derive(Debug, Clone)]
+pub enum SampleLoadError {
+	Configuration(String),
+	Database(String),
+	Protocol(String),
+	OtherError(String),
+	ColumnMissing(String),
+	ColumnDecode { index: String, source: String },
+	Decode(String),
+	FileNotFound,
+	PermissionDenied,
+	EmptyTable,
+	Unknown,
+}
+
 impl Sample {
-	pub async fn load_from_db(db_path: &Path) -> Vec<Self> {
-		let mut database = sqlx::SqliteConnection::connect(db_path.to_str().unwrap()).await.unwrap();
-		let data = query_as!(Self, "SELECT * FROM samples").fetch_all(&mut database).await.unwrap();
-		return data;
+	pub async fn load_from_db(db_path: &Path) -> Result<Vec<Self>, SampleLoadError> {
+		use sqlx::Error::*;
+		match sqlx::SqliteConnection::connect(db_path.to_str().unwrap()).await {
+			Ok(mut database) => {
+				match query_as!(Self, "SELECT * FROM samples").fetch_all(&mut database).await {
+					Ok(data) => return Ok(data),
+					Err(Database(database_error)) => return Err(SampleLoadError::Database(format!("{:?}", database_error))),
+					Err(Protocol(error)) => return Err(SampleLoadError::Protocol(error)),
+					Err(RowNotFound) => return Err(SampleLoadError::EmptyTable),
+					Err(ColumnNotFound(column)) => return Err(SampleLoadError::ColumnMissing(column)),
+					Err(ColumnDecode { index, source }) => return Err(SampleLoadError::ColumnDecode { index, source: format!("{:?}", source) }),
+					Err(Decode(error)) => return Err(SampleLoadError::Decode(format!("{:?}", error))),
+					_ => return Err(SampleLoadError::Unknown),
+				};
+			},
+			Err(Configuration(error)) => return Err(SampleLoadError::Configuration(format!("{:?}", error))),
+			Err(Database(database_error)) => return Err(SampleLoadError::Database(format!("{:?}", database_error))),
+			Err(Protocol(error)) => return Err(SampleLoadError::Protocol(error)),
+			Err(Io(error)) => {
+				match error.kind() {
+					ErrorKind::NotFound => return Err(SampleLoadError::FileNotFound),
+					ErrorKind::PermissionDenied => return Err(SampleLoadError::PermissionDenied),
+					other_error => return Err(SampleLoadError::OtherError(format!("{:?}", other_error))),
+				}
+			},
+			_ => return Err(SampleLoadError::Unknown),
+		}
 	}
 }

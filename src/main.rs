@@ -117,10 +117,16 @@ fn main() -> Result<(), Box<dyn Error>> {
 				.set_title("Choose the database")
 				.pick_file().await;
 			if let Some(picked_file) = picked_file {
-				let loaded_data = data::Sample::load_from_db(picked_file.path()).await;
-				ui.set_sample_count(loaded_data.len() as i32);
-				*data.borrow_mut() = Some(loaded_data);
-				ui.set_data_loaded(true);
+				match data::Sample::load_from_db(picked_file.path()).await {
+					Ok(loaded_data) => {
+						ui.set_sample_count(loaded_data.len() as i32);
+						*data.borrow_mut() = Some(loaded_data);
+						ui.set_data_loaded(true);
+					}
+					Err(error) => {
+						error_dialog::show_error_dialog("Samples not loaded", error).await;
+					}
+				}
 			}
 			ui.set_load_data_open(false);
 		}).unwrap();
